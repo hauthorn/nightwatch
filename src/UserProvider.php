@@ -34,15 +34,23 @@ final class UserProvider
     public function id(): LazyValue|string
     {
         if ($this->auth->hasUser()) {
-            return Str::tinyText((string) $this->auth->id());
+            $id = $this->auth->id();
+            $details = $this->details();
+            if (isset($details['id'])) {
+                $id = $details['id'];
+            }
+
+            return Str::tinyText((string) $id); // @phpstan-ignore cast.string
         }
 
         return new LazyValue(function () {
-            if ($this->auth->hasUser()) {
-                return Str::tinyText((string) $this->auth->id());
-            } else {
-                return Str::tinyText((string) $this->rememberedUser?->getAuthIdentifier());  // @phpstan-ignore cast.string
+            $id = $this->auth->id();
+            $details = $this->details();
+            if (isset($details['id'])) {
+                $id = $details['id'];
             }
+
+            return Str::tinyText((string) $id); // @phpstan-ignore cast.string
         });
     }
 
