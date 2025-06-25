@@ -34,21 +34,13 @@ final class UserProvider
     public function id(): LazyValue|string
     {
         if ($this->auth->hasUser()) {
-            $id = $this->auth->id();
-            $details = $this->details();
-            if (isset($details['id'])) {
-                $id = $details['id'];
-            }
+            $id = $this->getId();
 
             return Str::tinyText((string) $id); // @phpstan-ignore cast.string
         }
 
         return new LazyValue(function () {
-            $id = $this->auth->id();
-            $details = $this->details();
-            if (isset($details['id'])) {
-                $id = $details['id'];
-            }
+            $id = $this->getId();
 
             return Str::tinyText((string) $id); // @phpstan-ignore cast.string
         });
@@ -84,5 +76,16 @@ final class UserProvider
     public function remember(Authenticatable $user): void
     {
         $this->rememberedUser = $user;
+    }
+
+    private function getId(): int|string|null
+    {
+        $id = $this->auth->id();
+        $details = $this->details();
+        if (isset($details['id'])) {
+            $id = $details['id'];
+        }
+
+        return $id;
     }
 }
